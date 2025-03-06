@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Locations Map</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+            max-width: 340px;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            border-left: 4px solid #22663B;
+        }
+
+        .info-header {
+            margin: 0 0 15px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.2;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 10px;
+        }
+
+        .info-content {
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .legend {
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .legend-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-text {
+            font-size: 15px;
+            color: #444;
+            font-weight: 500;
+        }
+        .marker-cluster,
+        .marker-cluster-small,
+        .marker-cluster-medium,
+        .marker-cluster-large {
+            background-clip: padding-box;
+            border-radius: 50% !important;
+        }
+        
+        .marker-cluster div,
+        .marker-cluster-small div,
+        .marker-cluster-medium div,
+        .marker-cluster-large div {
+            border-radius: 50% !important;
+            width: 48px !important;
+            height: 48px !important;
+            line-height: 48px !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            margin-left: 6px !important;
+            margin-top: 6px !important;
+        }
+        
+        /* Custom color scheme as requested */
+        /* Large clusters - dark green */
+        .marker-cluster-large {
+            background-color: rgba(34, 102, 59, 0.6) !important; /* Dark green outer */
+        }
+        .marker-cluster-large div {
+            background-color: rgba(34, 102, 59, 0.8) !important; /* Dark green inner */
+        }
+        
+        /* Medium clusters - light green */
+        .marker-cluster-medium {
+            background-color: rgba(79, 175, 105, 0.6) !important; /* Light green outer */
+        }
+        .marker-cluster-medium div {
+            background-color: rgba(79, 175, 105, 0.8) !important; /* Light green inner */
+        }
+        
+        /* Small clusters - light green */
+        .marker-cluster-small {
+            background-color: rgba(105, 201, 131, 0.6) !important; /* Lighter green outer */
+        }
+        .marker-cluster-small div {
+            background-color: rgba(105, 201, 131, 0.8) !important; /* Lighter green inner */
+        }
+        
+        /* For individual markers - will be handled in JavaScript */
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #EC5E2A; /* Orange */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background-color: #ffdddd;
+            color: #d8000c;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        /* Custom orange marker icon */
+        .custom-marker-icon {
+            background-color: #EC5E2A; 
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="info-panel">
+        <h2 class="info-header">Wilkes Prize 2025 Applicants</h2>
+        <div class="info-content">
+            Displaying 508 locations
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #22663B;">50+</div>
+                <span class="legend-text">Large cluster</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #4FAF69;">10+</div>
+                <span class="legend-text">Medium cluster</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #EC5E2A;">1</div>
+                <span class="legend-text">Individual location</span>
+            </div>
+        </div>
+    </div>
+    
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    
+    <script>
+        // Initialize the map - set world view
+        const map = L.map('map', {
+            minZoom: 3,
+            maxBounds: [
+                [-90, -180], // Southwest corner
+                [90, 180]    // Northeast corner
+            ],
+            maxBoundsViscosity: 1.0, // Keep the view within bounds
+            worldCopyJump: false
+        }).setView([10, 0], 2); // Lower zoom level to show more of the world
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+    noWrap: true,
+    bounds: [[-90, -180], [90, 180]]
+}).addTo(map);
+
+        
+        // Function to ensure world view on startup and reset
+        function setWorldView() {
+            map.setView([10, 0], 2.5, {animate: true});
+        }
+        
+
+        
+        // Add a button to reset to world view
+        const worldViewControl = L.Control.extend({
+            options: {
+                position: 'topleft'
+            },
+            onAdd: function() {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                const button = L.DomUtil.create('a', '', container);
+                button.innerHTML = '🌎';
+                button.title = 'Show World View';
+                button.href = '#';
+                button.style.fontSize = '18px';
+                button.style.fontWeight = 'bold';
+                button.style.textDecoration = 'none';
+                button.style.textAlign = 'center';
+                button.style.lineHeight = '30px';
+                
+                L.DomEvent.on(button, 'click', function(e) {
+                    L.DomEvent.preventDefault(e);
+                    setWorldView();
+                });
+                
+                return container;
+            }
+        });
+        
+        map.addControl(new worldViewControl());
+        
+        // Create custom orange marker icon for individual locations
+        const orangeIcon = L.divIcon({
+            className: 'custom-marker-icon',
+            iconSize: [30, 30],
+            html: '<div style="width:100%;height:100%;background-color:#EC5E2A;border-radius:50%;"></div>'
+        });
+        
+        // Create a marker cluster group with custom styling for round clusters
+        const markers = L.markerClusterGroup({
+            chunkedLoading: true,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            disableClusteringAtZoom: 10,
+            maxClusterRadius: function(zoom) {
+                if (zoom <= 2) return 100;       // World view
+                else if (zoom <= 4) return 80;   // Continental view
+                else if (zoom <= 6) return 60;   // Country view
+                else if (zoom <= 8) return 40;   // Regional view
+                else return 20;                  // Local view
+            },
+            iconCreateFunction: function(cluster) {
+                const count = cluster.getChildCount();
+                let className = 'marker-cluster-';
+                
+                if (count < 10) {
+                    className += 'small';
+                } else if (count < 50) {
+                    className += 'medium';
+                } else {
+                    className += 'large';
+                }
+                
+                // Create completely round cluster icon
+                return L.divIcon({ 
+                    html: '<div><span>' + count + '</span></div>', 
+                    className: className,
+                    iconSize: L.point(60, 60) // Larger cluster icons
+                });
+            }
+        });
+        
+        // Add the empty marker cluster group to the map
+        map.addLayer(markers);
+        
+        // Function to load CSV data
+        function loadLocationData() {
+            const loadingElement = document.getElementById('loading');
+            
+            Papa.parse('geocoded_locations.csv', {
+                download: true,
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    // Hide loading indicator
+                    loadingElement.style.display = 'none';
+                    
+                    if (results.errors && results.errors.length > 0) {
+                        showError('Error parsing CSV: ' + results.errors[0].message);
+                        return;
+                    }
+                    
+                    // Filter out rows with invalid coordinates
+                    const validLocations = results.data.filter(loc => 
+                        loc && loc.latitude !== null && loc.longitude !== null && 
+                        !isNaN(loc.latitude) && !isNaN(loc.longitude)
+                    );
+                    
+                    document.querySelector('.info-content').innerHTML = 
+                    `Displaying ${validLocations.length} locations<br> from around the world.` 
+                    
+                    // Add markers for each location
+                    validLocations.forEach(loc => {
+                        // Create marker with custom orange icon
+                        const marker = L.marker([loc.latitude, loc.longitude], {
+                            icon: orangeIcon
+                        });
+                        
+                        // Create popup content
+                        let popupContent = `<strong>${loc.location || 'Unknown Location'}</strong>`;
+                        
+                        // Add address if available
+                        if (loc.address) {
+                            popupContent += `<br><em>${loc.address}</em>`;
+                        }
+                        
+                        // Add coordinates
+                        popupContent += `<br><small>Coordinates: ${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}</small>`;
+                        
+                        // Bind popup to marker
+                        marker.bindPopup(popupContent);
+                        
+                        // Add marker to cluster group
+                        markers.addLayer(marker);
+                    });
+                },
+                error: function(error) {
+                    // Hide loading indicator
+                    loadingElement.style.display = 'none';
+                    
+                    // Show error message
+                    showError('Failed to load CSV file: ' + error.message);
+                }
+            });
+        }
+        
+        // Function to show error messages
+        function showError(message) {
+            const infoPanel = document.querySelector('.info-panel');
+            
+            // Create error message element
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            errorElement.textContent = message;
+            
+            // Add to info panel
+            infoPanel.appendChild(errorElement);
+        }
+        
+        // Load data when page is ready
+        document.addEventListener('DOMContentLoaded', loadLocationData);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            map.invalidateSize();
+        });
+    </script>
+</body>
+</html>
