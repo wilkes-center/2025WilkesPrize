@@ -347,10 +347,10 @@
         <div class="spinner"></div>
     </div>
     
-    <!-- Visitor counter -->
+    <!-- Visitor counter with GoatCounter widget -->
     <div class="visitor-counter">
         <span id="visitor-icon">👥</span>
-        <span id="visitor-count">--</span> visitors
+        <span id="gc-counter" class="gc-counter"></span> visitors
     </div>
 
     <!-- External JavaScript libraries -->
@@ -358,9 +358,23 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     
-    <!-- GoatCounter analytics -->
+    <!-- GoatCounter analytics with widget script -->
     <script data-goatcounter="https://wilkes.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
+            
+    <!-- GoatCounter widget script for displaying visit count -->
+    <script>
+        // Create a widget script element
+        const gcWidgetScript = document.createElement('script');
+        gcWidgetScript.src = "//gcw.zgo.at/widget.js";
+        gcWidgetScript.setAttribute('data-goatcounter-widget', 'wilkes');
+        gcWidgetScript.setAttribute('data-goatcounter-property', 'count');
+        gcWidgetScript.setAttribute('data-goatcounter-class', 'gc-counter');
+        gcWidgetScript.async = true;
+        
+        // Append it to the document head
+        document.head.appendChild(gcWidgetScript);
+    </script>
     
     <script>
         // Initialize map with custom settings
@@ -515,7 +529,6 @@
         // Initialize map when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             loadLocationData();
-            updateVisitorCount();
         });
         
         // Handle window resize
@@ -523,35 +536,7 @@
             map.invalidateSize();
         });
         
-        // Update visitor count using GoatCounter API
-        function updateVisitorCount() {
-            const visitorCountElement = document.getElementById('visitor-count');
-            visitorCountElement.textContent = '...';
-            
-            fetch('https://wilkes.goatcounter.com/counter/total.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch visitor count');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data && data.count) {
-                        visitorCountElement.textContent = data.count.toLocaleString();
-                    } else {
-                        visitorCountElement.textContent = '0';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error retrieving visitor count:', error);
-                    // Use window.goatcounter if available (the counter from the script)
-                    if (window.goatcounter && window.goatcounter.count) {
-                        visitorCountElement.textContent = '1';
-                    } else {
-                        visitorCountElement.textContent = '--';
-                    }
-                });
-        }
+        // Visitor count is now handled by the GoatCounter widget
     </script>
 </body>
 </html>
