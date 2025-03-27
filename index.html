@@ -519,18 +519,42 @@
             map.invalidateSize();
         });
         
-        // Update visitor count using CountAPI
+        // Update visitor count using CountAPI with JSONP approach to avoid CORS issues
         function updateVisitorCount() {
             const visitorCountElement = document.getElementById('visitor-count');
-            fetch('https://api.countapi.xyz/hit/wilkes-center.github.io/2025WilkesPrize/visits')
-                .then(response => response.json())
-                .then(data => {
+            
+            // Create a new script element for JSONP
+            const script = document.createElement('script');
+            
+            // Define a global callback function
+            window.countCallback = function(data) {
+                if (data && data.value) {
                     visitorCountElement.textContent = data.value.toLocaleString();
-                })
-                .catch(error => {
-                    console.error('Error fetching visitor count:', error);
+                } else {
                     visitorCountElement.textContent = '--';
-                });
+                }
+                // Clean up
+                document.body.removeChild(script);
+                delete window.countCallback;
+            };
+            
+            // Add a timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            
+            // Set the source URL with callback parameter
+            script.src = `https://api.countapi.xyz/hit/wilkes-2025-prize/visits?callback=countCallback&_=${timestamp}`;
+            
+            // Add error handling
+            script.onerror = function() {
+                console.error('Error loading visitor count');
+                visitorCountElement.textContent = '--';
+                // Clean up
+                document.body.removeChild(script);
+                delete window.countCallback;
+            };
+            
+            // Append script to the document to start the request
+            document.body.appendChild(script);
         }
     </script>
 </body>
