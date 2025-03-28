@@ -53,7 +53,7 @@
             top: 15px;
             right: 15px;
             z-index: 1000;
-            background: rgba(249, 246, 239, 0.70);
+            background: rgba(249, 246, 239, 0.80);
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
@@ -65,7 +65,7 @@
         /* Title styling */
         .info-title {
             margin: 0 0 5px 0;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
             color: #1a1a1a;
             line-height: 1.2;
@@ -73,7 +73,7 @@
 
         /* Content text styling */
         .info-content {
-            font-size: 9pt;
+            font-size: 10pt;
             margin-bottom: 20px;
             line-height: 1.5;
             color: #1a1a1a;
@@ -97,17 +97,17 @@
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
             overflow: hidden;
-            width: 30px;
+            width: 36px;
         }
         
         /* Control button styling */
         .custom-control a {
             display: block;
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
             color: #2d5954;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             text-align: center;
             text-decoration: none;
@@ -288,6 +288,102 @@
             color: white;
             font-weight: bold;
         }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .info-panel {
+                top: auto;
+                bottom: 15px;
+                right: 15px;
+                max-width: calc(100% - 30px);
+                max-height: 40%;
+                overflow-y: auto;
+                padding: 12px;
+            }
+            
+            .info-title {
+                font-size: 18px;
+            }
+            
+            .info-content {
+                font-size: 9pt;
+                margin-bottom: 15px;
+            }
+            
+            .legend-item {
+                margin-bottom: 6px;
+            }
+            
+            .legend-icon {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .visitor-counter {
+                bottom: auto;
+                top: 80px;
+                left: 15px;
+                font-size: 10px;
+                padding: 6px 10px;
+            }
+            
+            .custom-control a {
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+                font-size: 20px;
+            }
+            
+            .custom-control {
+                width: 40px;
+            }
+            
+            .back-control {
+                padding: 8px 12px;
+            }
+            
+            .back-control a {
+                font-size: 12px;
+            }
+            
+            /* Toggle button for info panel on mobile */
+            .toggle-info {
+                display: block;
+                position: absolute;
+                bottom: 15px;
+                right: 15px;
+                z-index: 1001;
+                background-color: #f9f6ef;
+                border: 1px solid #cea25d;
+                border-radius: 5px;
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+                text-align: center;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+                color: #2d5954;
+                font-size: 20px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            
+            .info-panel.hidden {
+                display: none;
+            }
+        }
+        
+        /* For extremely small screens */
+        @media (max-width: 380px) {
+            .map-controls-container {
+                top: 10px;
+                left: 10px;
+                gap: 8px;
+            }
+            
+            .back-control a {
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -315,11 +411,14 @@
         </div>
     </div>
     
+    <!-- Toggle button for info panel on mobile -->
+    <div class="toggle-info" id="toggle-info" style="display: none;">ℹ️</div>
+    
     <!-- Info panel with title and legend -->
-    <div class="info-panel">
+    <div class="info-panel" id="info-panel">
         <h1 class="info-title">Wilkes Prize 2025</h1>
         <div class="info-content">
-            Displaying 508 applicant locations from around the world for the 2025 Wilkes Center Climate Launch Prize.
+            Displaying 508 unique applicant locations from around the world for the 2025 Wilkes Center Climate Launch Prize.
         </div>
         <!-- Legend -->
         <div class="legend">
@@ -379,7 +478,7 @@
     <script>
         // Initialize map with custom settings
         const map = L.map('map', {
-            minZoom: 3,
+            minZoom: 2,
             maxBounds: [
                 [-90, -180],
                 [90, 180]
@@ -387,7 +486,7 @@
             maxBoundsViscosity: 1.0,
             worldCopyJump: false,
             zoomControl: false
-        }).setView([10, 0], 2);
+        }).setView([20, 0], 2.5);
         
         // Add map tile layer
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -401,7 +500,7 @@
         // World view control handler
         document.getElementById('world-view-control').querySelector('a').addEventListener('click', function(e) {
             e.preventDefault();
-            map.setView([10, 0], 2.5, {animate: true});
+            map.setView([20, 0], 2.5, {animate: true});
         });
         
         // Zoom control handlers
@@ -484,9 +583,9 @@
                         !isNaN(loc.latitude) && !isNaN(loc.longitude)
                     );
                     
-                    // Update info panel with location count
+                    // Update info panel with location count - 508 unique locations
                     document.querySelector('.info-content').innerHTML = 
-                    `Displaying ${validLocations.length} applicant locations from around the world for the Wilkes Center 2025 Climate Launch Prize.` 
+                    `Displaying 508 unique applicant locations from around the world for the 2025 Wilkes Center Climate Launch Prize.`;
                     
                     // Add markers for each valid location
                     validLocations.forEach(loc => {
@@ -526,16 +625,60 @@
             infoPanel.appendChild(errorElement);
         }
         
+        // Mobile-specific enhancements
+        function setupMobileView() {
+            const infoPanel = document.getElementById('info-panel');
+            const toggleInfo = document.getElementById('toggle-info');
+            
+            // Check if the device is mobile
+            function isMobile() {
+                return window.innerWidth <= 768;
+            }
+            
+            // Function to handle the info panel display
+            function handleInfoPanel() {
+                if (isMobile()) {
+                    toggleInfo.style.display = 'block';
+                    
+                    // Initially hide the info panel on mobile
+                    if (!sessionStorage.getItem('infoPanelState')) {
+                        infoPanel.classList.add('hidden');
+                    }
+                } else {
+                    toggleInfo.style.display = 'none';
+                    infoPanel.classList.remove('hidden');
+                }
+            }
+            
+            // Toggle info panel when button is clicked
+            toggleInfo.addEventListener('click', function() {
+                infoPanel.classList.toggle('hidden');
+                
+                // Store panel state in session storage
+                if (infoPanel.classList.contains('hidden')) {
+                    sessionStorage.setItem('infoPanelState', 'hidden');
+                } else {
+                    sessionStorage.setItem('infoPanelState', 'visible');
+                }
+            });
+            
+            // Set up on page load
+            handleInfoPanel();
+            
+            // Update on window resize
+            window.addEventListener('resize', handleInfoPanel);
+        }
+        
         // Initialize map when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             loadLocationData();
+            setupMobileView();
         });
         
         // Handle window resize
         window.addEventListener('resize', function() {
             map.invalidateSize();
         });
-        
     </script>
 </body>
 </html>
