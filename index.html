@@ -446,7 +446,7 @@
         <div class="spinner"></div>
     </div>
     
-    <!-- Visitor counter with GoatCounter widget -->
+    <!-- Visitor counter -->
     <div class="visitor-counter">
         <span id="visitor-icon">👥</span>
         <span id="gc-counter" class="gc-counter"></span> visitors
@@ -461,22 +461,10 @@
     <script data-goatcounter="https://wilkes.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
             
-    <!-- GoatCounter widget script for displaying visit count -->
-    <script>
-        window.addEventListener('load', function() {
-            // Create a widget script element
-            const gcWidgetScript = document.createElement('script');
-            gcWidgetScript.src = "https://gc.zgo.at/widgets.js";
-            gcWidgetScript.setAttribute('data-goatcounter', 'https://wilkes.goatcounter.com/counter');
-            gcWidgetScript.setAttribute('data-goatcounter-count-path', '/');
-            gcWidgetScript.setAttribute('data-goatcounter-widget', 'counter');
-            gcWidgetScript.setAttribute('data-goatcounter-selector', '#gc-counter');
-            gcWidgetScript.async = true;
-            
-            // Append it to the document head
-            document.head.appendChild(gcWidgetScript);
-        });
-    </script>
+    <script data-goatcounter="https://wilkes.goatcounter.com/counter"
+    data-goatcounter-widget="total"
+    data-goatcounter-selector="#gc-counter"
+    async src="https://gc.zgo.at/widgets.js"></script>
     
     <script>
         // Initialize map with custom settings
