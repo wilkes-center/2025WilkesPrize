@@ -1,0 +1,202 @@
+/* Info panel containing title and legend */
+.info-panel {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+    background: rgba(249, 246, 239, 0.80);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+    max-width: 250px;
+    font-family: 'Sora', sans-serif;
+    border-left: 4px solid #2d5954;
+}
+
+/* Title styling */
+.info-title {
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.2;
+}
+
+/* Content text styling */
+.info-content {
+    font-size: 10pt;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    color: #1a1a1a;
+}
+
+/* Container for map controls */
+.map-controls-container {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Custom control buttons (zoom and world view) */
+.custom-control {
+    background-color: #f9f6ef;
+    border: 1px solid #cea25d;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    width: 36px;
+}
+
+/* Control button styling */
+.custom-control a {
+    display: block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    color: #2d5954;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+/* Control button hover effect */
+.custom-control a:hover {
+    background-color: #99aa88;
+    color: #1a1a1a;
+}
+
+/* Separator between zoom controls */
+.custom-control a:first-child {
+    border-bottom: 1px solid #cea25d;
+}
+
+/* Back button container */
+.back-control {
+    background-color: rgba(249, 246, 239, 0.70);
+    border: 1px solid #cea25d;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    padding: 8px 15px;
+}
+
+/* Back button link styling */
+.back-control a {
+    color: #2d5954;
+    text-decoration: none;
+    font-family: 'Sora', sans-serif;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+/* Back button hover effect */
+.back-control a:hover {
+    color: #dd3b00;
+}
+
+/* Legend container */
+.legend {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eaeaea;
+    max-width: 100%;
+}
+
+/* Legend item container */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Legend icon styling */
+.legend-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Legend text styling */
+.legend-text {
+    font-size: 9pt;
+    color: #1a1a1a;
+    font-weight: 400;
+}
+
+/* Marker cluster base styles */
+.marker-cluster,
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+    background-clip: padding-box;
+    border-radius: 50% !important;
+}
+
+/* Marker cluster number styling */
+.marker-cluster div,
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+    border-radius: 50% !important;
+    width: 48px !important;
+    height: 48px !important;
+    line-height: 48px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    margin-left: 6px !important;
+    margin-top: 6px !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Large cluster styling */
+.marker-cluster-large {
+    background-color: rgba(45, 89, 84, 0.6) !important;
+}
+.marker-cluster-large div {
+    background-color: rgba(45, 89, 84, 0.8) !important;
+}
+
+/* Medium cluster styling */
+.marker-cluster-medium {
+    background-color: rgba(153, 170, 136, 0.6) !important;
+}
+.marker-cluster-medium div {
+    background-color: rgba(153, 170, 136, 0.8) !important;
+}
+
+/* Small cluster styling */
+.marker-cluster-small {
+    background-color: rgba(206, 162, 93, 0.6) !important;
+}
+.marker-cluster-small div {
+    background-color: rgba(206, 162, 93, 0.8) !important;
+}
+
+/* Individual marker icon */
+.custom-marker-icon {
+    background-color: #dd3b00;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    font-weight: bold;
+} 
