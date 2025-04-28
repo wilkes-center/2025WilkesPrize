@@ -326,11 +326,17 @@
             }
             
             .visitor-counter {
-                bottom: auto;
-                top: 80px;
-                left: 15px;
-                font-size: 10px;
-                padding: 6px 10px;
+                display: none; /* Hide desktop counter on mobile */
+            }
+            
+            .visitor-counter-mobile {
+                display: block;
+                margin-top: 15px;
+                border-top: 1px solid #eaeaea;
+                padding-top: 15px;
+                font-family: 'Sora', sans-serif;
+                font-size: 12px;
+                color: #2d5954;
             }
             
             .custom-control a {
@@ -390,6 +396,11 @@
                 font-size: 11px;
             }
         }
+
+        /* Hide mobile counter on desktop */
+        .visitor-counter-mobile {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -444,6 +455,14 @@
                 <div class="legend-icon" style="background-color: #dd3b00;">1</div>
                 <span class="legend-text">Individual location</span>
             </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background-color: #2b5797;">F</div>
+                <span class="legend-text">Finalist location</span>
+            </div>
+        </div>
+        <!-- Visitor counter for mobile only -->
+        <div class="visitor-counter-mobile">
+            <span id="gc-counter-mobile" class="gc-counter"></span><span class="visitor-label">   visitors</span>
         </div>
     </div>
     
@@ -451,8 +470,8 @@
     <div id="loading" class="loading-overlay">
         <div class="spinner"></div>
     </div>
-    
-    <!-- Visitor counter -->
+
+    <!-- Visitor counter for desktop -->
     <div class="visitor-counter">
         <span id="gc-counter" class="gc-counter"></span><span class="visitor-label">   visitors</span>
     </div>
@@ -466,8 +485,20 @@
         var t = setInterval(function() {
             if (window.goatcounter && window.goatcounter.visit_count) {
                 clearInterval(t);
+                // Desktop counter
                 window.goatcounter.visit_count({
                     append: '#gc-counter',
+                    path: 'TOTAL',
+                    type: 'html',
+                    no_branding: true,
+                    attr: { width: '40', height: '40' },
+                    style: `div { border-color: #cea25d; background-color: #f9f6ef; color: #2d5954; font-size: 8px; text-align: left; padding: 0; margin: 0; }
+                           #gcvc-for { display: none; }
+                           #gcvc-views { font-size: 18px; font-weight: 500; text-align: left; }`
+                });
+                // Mobile counter
+                window.goatcounter.visit_count({
+                    append: '#gc-counter-mobile',
                     path: 'TOTAL',
                     type: 'html',
                     no_branding: true,
@@ -531,6 +562,12 @@
             iconSize: [30, 30],
             html: '<div style="width:100%;height:100%;background-color:#dd3b00;border-radius:50%;"></div>'
         });
+
+        const finalistIcon = L.divIcon({
+            className: 'custom-marker-icon',
+            iconSize: [42, 42],
+            html: '<div style="width:100%;height:100%;background-color:black;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f9f6ef;font-family:\'Sora\',sans-serif;font-weight:600;font-size:22px;box-shadow:0 0 0 3px tan, 0 4px 12px rgba(0,0,0,0.3);">F</div>'
+        });
         
         // Initialize marker cluster group with custom settings
         const markers = L.markerClusterGroup({
@@ -568,17 +605,30 @@
         
         map.addLayer(markers);
         
+        // Create a separate layer group for finalists that won't be clustered
+        const finalistsLayer = L.layerGroup().addTo(map);
+        
         // Load and process location data from CSV
         function loadLocationData() {
             const loadingElement = document.getElementById('loading');
+            let loadedFiles = 0;
+            const totalFiles = 2;
+
+            function checkAllFilesLoaded() {
+                loadedFiles++;
+                if (loadedFiles === totalFiles) {
+                    loadingElement.style.display = 'none';
+                }
+            }
             
+            // Load main applicant data
             Papa.parse('geocoded_locations_all.csv', {
                 download: true,
                 header: true,
                 dynamicTyping: true,
                 skipEmptyLines: true,
                 complete: function(results) {
-                    loadingElement.style.display = 'none';
+                    checkAllFilesLoaded();
                     
                     if (results.errors && results.errors.length > 0) {
                         showError('Error parsing CSV: ' + results.errors[0].message);
@@ -591,7 +641,7 @@
                         !isNaN(loc.latitude) && !isNaN(loc.longitude)
                     );
                     
-                    // Update info panel with location count - 508 unique locations
+                    // Update info panel with location count
                     document.querySelector('.info-content').innerHTML = 
                     `Displaying applicant locations from around the world for the 2025 Wilkes Center Climate Launch Prize.`;
                     
@@ -615,9 +665,65 @@
                     });
                 },
                 error: function(error) {
-                    loadingElement.style.display = 'none';
+                    checkAllFilesLoaded();
+                    showError('Failed to load main CSV file: ' + error.message);
+                }
+            });
+
+            // Load finalist data
+            Papa.parse('finalists.csv', {
+                download: true,
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    checkAllFilesLoaded();
                     
-                    showError('Failed to load CSV file: ' + error.message);
+                    if (results.errors && results.errors.length > 0) {
+                        showError('Error parsing finalists CSV: ' + results.errors[0].message);
+                        return;
+                    }
+                    
+                    // Filter valid locations
+                    const validFinalists = results.data.filter(loc => 
+                        loc && loc.lat !== null && loc.lon !== null && 
+                        !isNaN(loc.lat) && !isNaN(loc.lon)
+                    );
+                    
+                    // Add markers for each valid finalist location
+                    validFinalists.forEach(loc => {
+                        // Add a small offset to finalist coordinates
+                        const offsetLat = loc.lat + 0.0005; // Slight north offset
+                        const offsetLon = loc.lon + 0.0005; // Slight east offset
+                        
+                        const marker = L.marker([offsetLat, offsetLon], {
+                            icon: finalistIcon,
+                            zIndexOffset: 1000  // Keep finalists visually on top
+                        });
+                        
+                        let companyName = loc["Company Name"] || 'Unknown Company';
+                        let companyDisplay = loc.link ? 
+                            `<a href='${loc.link}' target='_blank' style='color: #2d5954; text-decoration: underline;'>${companyName}</a>` : 
+                            companyName;
+                            
+                        let popupContent = '<div style="font-family: \'Sora\', sans-serif;">' +
+                            '<strong>Finalist: ' + companyDisplay + '</strong>';
+                            
+                        if (loc.formatted) {
+                            popupContent += '<br><em>' + loc.formatted + '</em>';
+                        }
+                        
+                        popupContent += '<br><small>Location: ' + loc.lat.toFixed(5) + ', ' + loc.lon.toFixed(5) + '</small>' +
+                            '</div>';
+                        
+                        marker.bindPopup(popupContent);
+                        
+                        finalistsLayer.addLayer(marker);
+                    });
+                },
+                error: function(error) {
+                    checkAllFilesLoaded();
+                    showError('Failed to load finalists CSV file: ' + error.message);
                 }
             });
         }
@@ -687,6 +793,9 @@
         window.addEventListener('resize', function() {
             map.invalidateSize();
         });
+
+        // Update the legend icon to match
+        document.querySelector('.legend-icon[style*="2b5797"]').setAttribute('style', 'background-color: black; border: 2px solid tan; color: #f9f6ef; font-family: Sora, sans-serif; font-weight: 600;');
     </script>
 </body>
 </html>
