@@ -47,8 +47,6 @@ function loadLocationData() {
                     popupContent += `<br><em>${loc.address}</em>`;
                 }
                 
-                popupContent += `<br><small>Coordinates: ${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}</small>`;
-                
                 marker.bindPopup(popupContent);
                 
                 markers.addLayer(marker);
@@ -103,8 +101,7 @@ function loadLocationData() {
                     popupContent += '<br><em>' + loc.formatted + '</em>';
                 }
                 
-                popupContent += '<br><small>Location: ' + loc.lat.toFixed(5) + ', ' + loc.lon.toFixed(5) + '</small>' +
-                    '</div>';
+                popupContent += '</div>';
                 
                 marker.bindPopup(popupContent);
                 
