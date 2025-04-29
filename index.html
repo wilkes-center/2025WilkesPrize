@@ -70,7 +70,11 @@
                 <span class="legend-text">Individual location</span>
             </div>
             <div class="legend-item">
-                <div class="legend-icon" style="background-color: #2b5797;">F</div>
+                <div class="legend-icon" style="display:flex;align-items:center;justify-content:center;background-color:#751d0c;border-radius:50%;">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <polygon fill="#f9f6ef" stroke="#f9f6ef" stroke-width="1.5" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                    </svg>
+                </div>
                 <span class="legend-text">Finalist location</span>
             </div>
         </div>
@@ -136,14 +140,10 @@
     <script src="js/mobile.js"></script>
     
     <script>
-        // Initialize map when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             loadLocationData();
             setupMobileView();
         });
-
-        // Update the legend icon to match
-        document.querySelector('.legend-icon[style*="2b5797"]').setAttribute('style', 'background-color: black; border: 2px solid tan; color: #f9f6ef; font-family: Sora, sans-serif; font-weight: 600;');
     </script>
 </body>
 </html>

@@ -6,5 +6,5 @@ Interactive visualization of 2025 Wilkes Prize applicant locations with dynamic 
 
 - Leaflet.js with markercluster plugin
 - PapaParse for CSV data processing
-- Carto Light basemap tiles
+- Mapbox GL basemap
 - HTML/CSS/JavaScript

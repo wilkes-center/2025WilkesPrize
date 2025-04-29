@@ -1,6 +1,6 @@
-// Initialize map with custom settings
 const map = L.map('map', {
     minZoom: 2,
+    maxZoom: 19,
     maxBounds: [
         [-90, -180],
         [90, 180]
@@ -10,36 +10,32 @@ const map = L.map('map', {
     zoomControl: false
 }).setView([20, 0], 2.5);
 
-// Add map tile layer
+// Add Carto light basemap
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
-    noWrap: true,
+    noWrap: false,
     bounds: [[-90, -180], [90, 180]]
 }).addTo(map);
 
-// World view control handler
-document.getElementById('world-view-control').querySelector('a').addEventListener('click', function(e) {
+document.getElementById('world-view-control').querySelector('a').addEventListener('click', e => {
     e.preventDefault();
     map.setView([20, 0], 2.5, {animate: true});
 });
 
-// Zoom control handlers
-const zoomInBtn = document.getElementById('zoom-control').querySelectorAll('a')[0];
-const zoomOutBtn = document.getElementById('zoom-control').querySelectorAll('a')[1];
+const zoomControl = document.getElementById('zoom-control');
+const zoomInBtn = zoomControl.querySelectorAll('a')[0];
+const zoomOutBtn = zoomControl.querySelectorAll('a')[1];
 
-zoomInBtn.addEventListener('click', function(e) {
+zoomInBtn.addEventListener('click', e => {
     e.preventDefault();
     map.zoomIn();
 });
 
-zoomOutBtn.addEventListener('click', function(e) {
+zoomOutBtn.addEventListener('click', e => {
     e.preventDefault();
     map.zoomOut();
 });
 
-// Handle window resize
-window.addEventListener('resize', function() {
-    map.invalidateSize();
-}); 
+window.addEventListener('resize', () => map.invalidateSize());

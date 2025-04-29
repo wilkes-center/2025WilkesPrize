@@ -1,19 +1,15 @@
-// Mobile-specific enhancements
 function setupMobileView() {
     const infoPanel = document.getElementById('info-panel');
     const toggleInfo = document.getElementById('toggle-info');
     
-    // Check if the device is mobile
     function isMobile() {
         return window.innerWidth <= 768;
     }
     
-    // Function to handle the info panel display
     function handleInfoPanel() {
         if (isMobile()) {
             toggleInfo.style.display = 'block';
             
-            // Initially hide the info panel on mobile
             if (!sessionStorage.getItem('infoPanelState')) {
                 infoPanel.classList.add('hidden');
             }
@@ -23,21 +19,15 @@ function setupMobileView() {
         }
     }
     
-    // Toggle info panel when button is clicked
-    toggleInfo.addEventListener('click', function() {
+    toggleInfo.addEventListener('click', () => {
         infoPanel.classList.toggle('hidden');
         
-        // Store panel state in session storage
-        if (infoPanel.classList.contains('hidden')) {
-            sessionStorage.setItem('infoPanelState', 'hidden');
-        } else {
-            sessionStorage.setItem('infoPanelState', 'visible');
-        }
+        sessionStorage.setItem(
+            'infoPanelState', 
+            infoPanel.classList.contains('hidden') ? 'hidden' : 'visible'
+        );
     });
     
-    // Set up on page load
     handleInfoPanel();
-    
-    // Update on window resize
     window.addEventListener('resize', handleInfoPanel);
-} 
+}
